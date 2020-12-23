@@ -3,11 +3,12 @@ import itertools
 import sys
 import os
 import json
+from typing import List
 
 import ECBHandler
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Simple tool to get currency rates history")
     parser.add_argument('-f', '--from-currency-list', nargs='+',
                         help='Currencies to find the rate history from', required=True)
@@ -22,9 +23,19 @@ def parse_args(args):
 
 
 def get_currency_conversion_rate(api_handler, from_currency_list: list, to_currency_list: list, from_date: str,
-                                 to_date: str):
+                                 to_date: str) -> dict:
+    """
+    Generate mapping from all currencies in from_currency_list to all currencies in to_currency_list
+    :param api_handler: object with a function get_translation_table_to_eur(currencies, from_date, to_date)
+    :param from_currency_list: list of all source currencies
+    :param to_currency_list: list of all target currencies
+    :param from_date: the first date to search in the format of yyyy-mm-dd
+    :param to_date: the last date to search in the format of yyyy-mm-dd
+    :return: dict {'(from_currency,to_currency)':{date:exchange_rate}}
+    """
     # in order to get get all relevant currencies to EUR add them with + as a separator
-    currencies = '+'.join(set(from_currency_list) | set(to_currency_list))
+
+    currencies = '+'.join(currency.upper() for currency in set(from_currency_list) | set(to_currency_list))
     translation_table_to_eur = api_handler.get_translation_table_to_eur(currencies, from_date, to_date)
 
     translation_table = {}
@@ -48,7 +59,7 @@ def get_currency_conversion_rate(api_handler, from_currency_list: list, to_curre
     return translation_table
 
 
-def main(args):
+def main(args: List[str]):
     args = parse_args(args)
     with open(args.output_file, 'w') as output_file:
         json.dump(get_currency_conversion_rate(api_handler=ECBHandler,
