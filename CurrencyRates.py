@@ -9,11 +9,13 @@ import ECBHandler
 
 def parse_args(args):
     parser = argparse.ArgumentParser(description="Simple tool to get currency rates history")
-    parser.add_argument('-f', '--from-currency-list', nargs='+', help='Currencies to find the rate history from')
-    parser.add_argument('-t', '--to-currency-list', nargs='+', help='Currencies to find the rate history to')
+    parser.add_argument('-f', '--from-currency-list', nargs='+',
+                        help='Currencies to find the rate history from', required=True)
+    parser.add_argument('-t', '--to-currency-list', nargs='+',
+                        help='Currencies to find the rate history to', required=True)
     parser.add_argument('-s', '--from-date', type=str, help='Starting date in the format of yyyy-mm-dd')
     parser.add_argument('-d', '--to-date', type=str, help='Ending date in the format of yyyy-mm-dd')
-    parser.add_argument('-o', '--output-file', type=str,
+    parser.add_argument('-o', '--output-file', type=str, help='Path for json output file',
                         default=os.path.join(os.path.abspath(os.path.expanduser('~')), 'currencies.json'))
 
     return parser.parse_args(args)
@@ -54,6 +56,8 @@ def main(args):
                                                to_currency_list=args.to_currency_list,
                                                from_date=args.from_date,
                                                to_date=args.to_date), output_file)
+        print(f'Output saved at {args.output_file}')
 
-    if __name__ == '__main__':
-        main(sys.argv[1:])
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
