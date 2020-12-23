@@ -3,7 +3,10 @@ import xmltodict
 
 
 def _get_serieses(parsed_response: dict) -> list:
-    return parsed_response["message:GenericData"]["message:DataSet"]["generic:Series"]
+    serieses = parsed_response["message:GenericData"]["message:DataSet"]["generic:Series"]
+    if type(serieses) != list:
+        serieses = [serieses]
+    return serieses
 
 
 def _extract_series_currencies(series: dict) -> tuple:
@@ -15,8 +18,15 @@ def _series_date_value_iter(data_points):
         yield data_point["generic:ObsDimension"]["@value"], data_point["generic:ObsValue"]["@value"]
 
 
+def _extract_data_points_from_series(series):
+    data_points = series["generic:Obs"]
+    if type(data_points) != list:
+        data_points = [data_points]
+    return data_points
+
+
 def _extract_series_date_value_mapping(series):
-    return {date: value for date, value in _series_date_value_iter(series["generic:Obs"])}
+    return {date: value for date, value in _series_date_value_iter(_extract_data_points_from_series(series))}
 
 
 def get_translation_table_to_eur(currencies: str, from_date: str, to_date: str):
@@ -30,6 +40,8 @@ def get_translation_table_to_eur(currencies: str, from_date: str, to_date: str):
     # in case the API returned error
     if response.status_code != 200:
         raise Exception(f'Error from the API: {response.text}')
+    elif response.text == '':
+        raise Exception('The API returned empty result')
 
     parsed = xmltodict.parse(response.text)
     serieses = _get_serieses(parsed)
