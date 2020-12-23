@@ -27,4 +27,4 @@ optional arguments:
 
 Usage Example:
 
-`python CurrencyRates.py --from-currency-list JPY USD --to-currency-list EUR USD --from-date=2020-05-01 --to-date=2020-05-01 -o ./currency.json`
+`python CurrencyRates.py --from-currency-list JPY USD --to-currency-list EUR USD --from-date=2020-05-01 --to-date=2020-05-30 -o ./currency.json`
