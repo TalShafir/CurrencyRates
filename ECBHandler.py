@@ -40,6 +40,8 @@ def get_translation_table_to_eur(currencies: str, from_date: str, to_date: str):
     # in case the API returned error
     if response.status_code != 200:
         raise Exception(f'Error from the API: {response.text}')
+    elif response.text == '':
+        raise Exception('The API returned empty result')
 
     parsed = xmltodict.parse(response.text)
     serieses = _get_serieses(parsed)
